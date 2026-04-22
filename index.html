@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Digital Contact Cards</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:Segoe UI;
+}
+
+body{
+  background: url("https://images.unsplash.com/photo-1492724441997-5dc865305da7") no-repeat center/cover;
+  padding:30px;
+}
+
+/* Add this also */
+.container{
+  max-width:900px;
+  margin:auto;
+  background: rgba(255,255,255,0.6);
+  backdrop-filter: blur(10px);
+  padding:20px;
+  border-radius:15px;
+}
+
+/* HEADER */
+h1{
+  text-align:center;
+  margin-bottom:20px;
+}
+
+/* FORM */
+.container{
+  max-width:900px;
+  margin:auto;
+}
+
+input, textarea{
+  width:100%;
+  padding:12px;
+  margin:10px 0;
+  border-radius:10px;
+  border:1px solid #ccc;
+  outline:none;
+}
+
+.row{
+  display:flex;
+  gap:10px;
+}
+
+.row input{
+  flex:1;
+}
+
+button{
+  width:100%;
+  padding:14px;
+  border:none;
+  border-radius:10px;
+  background:linear-gradient(to right,#1d72f3,#1ab2d6);
+  color:#fff;
+  font-weight:bold;
+  cursor:pointer;
+  margin-top:10px;
+}
+
+/* CARD */
+.cards{
+  margin-top:30px;
+  display:flex;
+  flex-wrap:wrap;
+  gap:20px;
+}
+
+.card{
+  width:250px;
+  background:#fff;
+  border-radius:15px;
+  padding:20px;
+  text-align:center;
+  box-shadow:0 5px 15px rgba(0,0,0,0.1);
+}
+
+.card img{
+  width:70px;
+  height:70px;
+  border-radius:50%;
+  object-fit:cover;
+  margin-bottom:10px;
+}
+
+.card h3{
+  margin:10px 0;
+}
+
+.card p{
+  font-size:14px;
+  margin:5px 0;
+}
+
+/* BUTTONS */
+.actions{
+  margin-top:10px;
+  display:flex;
+  justify-content:center;
+  gap:10px;
+}
+
+.edit{
+  background:#f4b400;
+  padding:6px 10px;
+  border-radius:6px;
+  color:#000;
+  cursor:pointer;
+}
+
+.delete{
+  background:#e53935;
+  padding:6px 10px;
+  border-radius:6px;
+  color:#fff;
+  cursor:pointer;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>⭐ Digital Contact Cards</h1>
+
+<input id="search" placeholder="🔍 Search by name or company...">
+
+<div class="row">
+  <input id="name" placeholder="Full Name">
+  <input id="company" placeholder="Company / Job">
+</div>
+
+<div class="row">
+  <input id="phone" placeholder="Phone">
+  <input id="email" placeholder="Email">
+</div>
+
+<input id="avatar" placeholder="Avatar URL">
+
+<textarea id="bio" placeholder="Short Bio"></textarea>
+
+<button onclick="saveContact()">💾 Save Contact</button>
+
+<div class="cards" id="cards"></div>
+
+</div>
+
+<script>
+let contacts = [];
+
+function saveContact(){
+  const name = document.getElementById("name").value;
+  const company = document.getElementById("company").value;
+  const phone = document.getElementById("phone").value;
+  const email = document.getElementById("email").value;
+  const avatar = document.getElementById("avatar").value || "https://via.placeholder.com/70";
+  const bio = document.getElementById("bio").value;
+
+  if(!name) return alert("Name required");
+
+  const contact = {name, company, phone, email, avatar, bio};
+  contacts.push(contact);
+
+  displayContacts();
+  clearForm();
+}
+
+function displayContacts(){
+  const cards = document.getElementById("cards");
+  cards.innerHTML = "";
+
+  contacts.forEach((c, index) => {
+    cards.innerHTML += `
+      <div class="card">
+        <img src="${c.avatar}" alt="avatar">
+        <h3>${c.name}</h3>
+        <p><b>${c.company}</b></p>
+        <p>${c.phone}</p>
+        <p>${c.email}</p>
+        <p>${c.bio}</p>
+
+        <div class="actions">
+          <div class="edit" onclick="editContact(${index})">✏️ Edit</div>
+          <div class="delete" onclick="deleteContact(${index})">🗑 Delete</div>
+        </div>
+      </div>
+    `;
+  });
+}
+
+function deleteContact(index){
+  contacts.splice(index,1);
+  displayContacts();
+}
+
+function editContact(index){
+  const c = contacts[index];
+
+  document.getElementById("name").value = c.name;
+  document.getElementById("company").value = c.company;
+  document.getElementById("phone").value = c.phone;
+  document.getElementById("email").value = c.email;
+  document.getElementById("avatar").value = c.avatar;
+  document.getElementById("bio").value = c.bio;
+
+  deleteContact(index);
+}
+
+function clearForm(){
+  document.querySelectorAll("input, textarea").forEach(el => el.value="");
+}
+
+/* SEARCH */
+document.getElementById("search").addEventListener("input", function(){
+  const value = this.value.toLowerCase();
+
+  const filtered = contacts.filter(c =>
+    c.name.toLowerCase().includes(value) ||
+    c.company.toLowerCase().includes(value)
+  );
+
+  const cards = document.getElementById("cards");
+  cards.innerHTML = "";
+
+  filtered.forEach((c, index) => {
+    cards.innerHTML += `
+      <div class="card">
+        <img src="${c.avatar}">
+        <h3>${c.name}</h3>
+        <p><b>${c.company}</b></p>
+        <p>${c.phone}</p>
+        <p>${c.email}</p>
+        <p>${c.bio}</p>
+      </div>
+    `;
+  });
+});
+</script>
+
+</body>
+</html>
